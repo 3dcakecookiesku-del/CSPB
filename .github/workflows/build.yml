@@ -19,17 +19,17 @@ jobs:
       - name: Compile NDK
         run: ndk-build -C jni APP_ABI=arm64-v8a
 
-      - name: Cari Lokasi File
+      - name: Ambil Semua File .so (Apapun Lokasinya)
         run: |
-          echo "Mencari semua file .so yang baru saja dibuat:"
-          find . -name "*.so"
-          
-          echo "--- ISI FOLDER JNI ---"
-          ls -R jni/
+          mkdir -p output
+          # Perintah ini mencari SEMUA file .so di semua folder dan memindahkannya ke output
+          find . -name "*.so" -exec cp {} output/ \;
+          echo "Daftar file yang berhasil dikumpulkan:"
+          ls -l output/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Debug_Hasil_Build
-          path: .  # Ini akan mengupload semua file agar kita bisa cek isinya
+          name: Hasil_Lib_CSPB_Lengkap
+          path: output/
           
