@@ -1,4 +1,4 @@
-name: Build CSPB Debug
+name: Build CSPB Final
 
 on: [push]
 
@@ -8,11 +8,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Debug Lokasi File
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r21e
+
+      - name: Ekstrak File
         run: |
-          echo "Daftar file Android.mk yang ditemukan:"
-          find . -name "Android.mk"
-          
-          echo "Daftar semua folder:"
-          ls -R
+          # Membuka file zip agar folder jni keluar
+          unzip -o jni.zip
+
+      - name: Compile NDK
+        run: |
+          # Sekarang folder jni sudah ada, kita bisa langsung build
+          ndk-build -C jni APP_ABI=arm64-v8a
+
+      - name: Kumpulkan Hasil
+        run: |
+          mkdir -p output/libs/arm64-v8a
+          # Ambil hasil .so dari folder jni/libs
+          cp -r jni/libs/arm64-v8a/*.so output/libs/arm64-v8a/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hasil_Lib_CSPB
+          path: output/
           
