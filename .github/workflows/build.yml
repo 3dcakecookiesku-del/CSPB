@@ -30,11 +30,16 @@ jobs:
           $ANDROID_NDK_LATEST_HOME/ndk-build
         fi
 
-    - name: Upload Output SO Files
+        - name: Upload Output SO Files
       uses: actions/upload-artifact@v4
       with:
         name: CS_PB_64bit_Libs
         path: |
           libs/
           jni/libs/
+          **/libxash.so
+          **/libmenu.so
+          **/libclient.so
+          **/libserver.so
+          
           
