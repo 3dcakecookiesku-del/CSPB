@@ -1,4 +1,4 @@
-name: Build Lib Official
+name: Build Minimal
 
 on: [push]
 
@@ -8,21 +8,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clone Source
-        run: |
-          mkdir -p jni/xash jni/menu
-          git clone --depth 1 https://github.com/FWGS/xash3d-fwgs jni/xash
-          git clone --depth 1 https://github.com/FWGS/xash-extras jni/menu
-
       - name: Setup NDK
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r21e
 
       - name: Build
-        run: |
-          cd jni
-          ndk-build APP_ABI=arm64-v8a
+        run: ndk-build -C jni APP_ABI=arm64-v8a
 
       - name: Upload
         uses: actions/upload-artifact@v4
