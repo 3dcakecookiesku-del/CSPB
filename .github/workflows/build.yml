@@ -1,4 +1,4 @@
-name: Build CSPB Full
+name: Build CSPB All-In
 
 on: [push]
 
@@ -13,28 +13,31 @@ jobs:
         with:
           ndk-version: r21e
 
-      - name: Compile NDK
+      - name: Build Proses
         run: |
+          # Jalankan build di semua folder
           for mk in $(find . -name "Android.mk"); do
             echo "Building: $(dirname "$mk")"
             ndk-build -C "$(dirname "$mk")" APP_ABI=arm64-v8a
           done
 
-      - name: Kumpulkan Semua File
+      - name: Ambil Semua File SO
         run: |
-          mkdir -p output/lib/xash output/lib/menu
+          # Buat folder output
+          mkdir -p output
           
-          # Mencari dan memindahkan file berdasarkan nama
-          # Menggunakan wildcard agar tidak terpengaruh nama file yang spesifik
-          find . -type f -name "*xash*.so" -exec cp {} output/lib/xash/ \;
-          find . -type f -name "*menu*.so" -exec cp {} output/lib/menu/ \;
+          # Cari SEMUA file berakhiran .so di seluruh direktori
+          # cp --parents akan menjaga struktur foldernya agar kamu tahu asal filenya
+          find . -type f -name "*.so" -exec cp --parents {} output/ \;
           
-          # Backup semua .so lainnya ke folder output
-          find . -type f -name "*.so" -exec cp {} output/ \;
+          # Tampilkan apa saja yang ditemukan di log
+          echo "Daftar file yang berhasil diambil:"
+          find output -name "*.so"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Hasil_Lengkap_CSPB
+          name: Hasil_Final_CSPB
           path: output/
+          if-no-files-found: error
           
