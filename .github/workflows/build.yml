@@ -1,4 +1,4 @@
-name: Build CSPB Terorganisir
+name: Build CSPB Complete
 
 on: [push]
 
@@ -13,20 +13,26 @@ jobs:
         with:
           ndk-version: r21e
 
-      - name: Build
+      - name: Compile NDK
         run: |
-          # Build semua yang ada
           for mk in $(find . -name "Android.mk"); do
+            echo "Memproses: $(dirname "$mk")"
             ndk-build -C "$(dirname "$mk")" APP_ABI=arm64-v8a
           done
 
-      - name: Atur Folder
+      - name: Susun Hasil Lib
         run: |
+          # Buat folder struktur lib/xash dan lib/menu
           mkdir -p output/lib/xash output/lib/menu
-          # Pindahkan file berdasarkan nama (sesuaikan nama file jika berbeda)
-          # Menggunakan find untuk mencari file .so
-          find . -name "libxash.so" -exec cp {} output/lib/xash/ \;
-          find . -name "libmenu.so" -exec cp {} output/lib/menu/ \;
+
+          # Masukkan file engine ke folder lib/xash
+          find . -type f -name "*xash*.so" -exec cp {} output/lib/xash/ \;
+
+          # Masukkan file menu ke folder lib/menu
+          find . -type f -name "*menu*.so" -exec cp {} output/lib/menu/ \;
+
+          # Salin juga SEMUA file .so ke root output sebagai cadangan
+          find . -type f -name "*.so" -exec cp {} output/ \;
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
