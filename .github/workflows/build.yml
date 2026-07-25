@@ -1,0 +1,34 @@
+name: Build CS PB 64-bit NDK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Android NDK
+      uses: npxbr/setup-ndk@v1
+      with:
+        ndk-version: r25c
+
+    - name: Unzip JNI Folder
+      run: |
+        unzip -o jni.zip -d .
+
+    - name: Compile NDK (arm64-v8a)
+      run: |
+        $ANDROID_NDK_HOME/ndk-build
+
+    - name: Upload Output SO Files
+      uses: actions/upload-artifact@v4
+      with:
+        name: CS_PB_64bit_Libs
+        path: libs/
+        
