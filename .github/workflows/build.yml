@@ -1,4 +1,4 @@
-name: Build CSPB All-In
+name: Build CSPB Debug
 
 on: [push]
 
@@ -8,36 +8,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup NDK
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r21e
-
-      - name: Build Proses
+      - name: Debug Lokasi File
         run: |
-          # Jalankan build di semua folder
-          for mk in $(find . -name "Android.mk"); do
-            echo "Building: $(dirname "$mk")"
-            ndk-build -C "$(dirname "$mk")" APP_ABI=arm64-v8a
-          done
-
-      - name: Ambil Semua File SO
-        run: |
-          # Buat folder output
-          mkdir -p output
+          echo "Daftar file Android.mk yang ditemukan:"
+          find . -name "Android.mk"
           
-          # Cari SEMUA file berakhiran .so di seluruh direktori
-          # cp --parents akan menjaga struktur foldernya agar kamu tahu asal filenya
-          find . -type f -name "*.so" -exec cp --parents {} output/ \;
-          
-          # Tampilkan apa saja yang ditemukan di log
-          echo "Daftar file yang berhasil diambil:"
-          find output -name "*.so"
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Hasil_Final_CSPB
-          path: output/
-          if-no-files-found: error
+          echo "Daftar semua folder:"
+          ls -R
           
