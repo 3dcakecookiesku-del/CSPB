@@ -20,9 +20,12 @@ jobs:
         run: |
           ndk-build -C jni
 
-      - name: Upload Output
-        uses: actions/upload-artifact@v4
-        with:
-          name: CS_PB_64bit_Libs
-          path: libs/
+          - name: Upload Output SO Files
+      uses: actions/upload-artifact@v4
+      with:
+        name: CS_PB_64bit_Libs
+        path: |
+          libs/arm64-v8a/*.so
+          jni/libs/arm64-v8a/*.so
+          
           
