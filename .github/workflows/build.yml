@@ -14,24 +14,22 @@ jobs:
           ndk-version: r21e
 
       - name: Ekstrak File
-        run: |
-          # Membuka file zip agar folder jni keluar
-          unzip -o jni.zip
+        run: unzip -o jni.zip
 
       - name: Compile NDK
-        run: |
-          # Sekarang folder jni sudah ada, kita bisa langsung build
-          ndk-build -C jni APP_ABI=arm64-v8a
+        run: ndk-build -C jni APP_ABI=arm64-v8a
 
-      - name: Kumpulkan Hasil
+      - name: Cari Lokasi File
         run: |
-          mkdir -p output/libs/arm64-v8a
-          # Ambil hasil .so dari folder jni/libs
-          cp -r jni/libs/arm64-v8a/*.so output/libs/arm64-v8a/
+          echo "Mencari semua file .so yang baru saja dibuat:"
+          find . -name "*.so"
+          
+          echo "--- ISI FOLDER JNI ---"
+          ls -R jni/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Hasil_Lib_CSPB
-          path: output/
+          name: Debug_Hasil_Build
+          path: .  # Ini akan mengupload semua file agar kita bisa cek isinya
           
