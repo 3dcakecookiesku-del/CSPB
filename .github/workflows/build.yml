@@ -1,37 +1,28 @@
 name: Build Lib Official
 
-on: [push] # Otomatis jalan saat kamu klik "Push" ke GitHub
+on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest # Menggunakan server Ubuntu terbaru
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4 # Mengambil file yang sudah kamu upload di repo
+      - uses: actions/checkout@v4
 
-      - name: Ambil Source Official
+      - name: Persiapan Source Official
         run: |
-          # Membuat folder agar tidak berantakan
-          mkdir -p jni/official
-          # Mendownload source official dari GitHub FWGS
-          git clone https://github.com/FWGS/xash3d-fwgs jni/official/xash
-          git clone https://github.com/FWGS/xash-extras jni/official/menu
-          
-      - name: Setup NDK
-        uses: nttld/setup-ndk@v1 # Menyiapkan mesin compiler NDK
-        with:
-          ndk-version: r21e # Versi NDK yang stabil untuk game engine
+          mkdir -p jni/xash jni/menu
+          # Mengambil source official FWGS
+          git clone --depth 1 https://github.com/FWGS/xash3d-fwgs jni/xash
+          git clone --depth 1 https://github.com/FWGS/xash-extras jni/menu
 
-      - name: Compile dengan NDK
-        # Memulai proses pembuatan libxash.so dan libmenu.so
-        run: ndk-build -C jni APP_ABI=arm64-v8a
+      - name: Compile
+        run: |
+          cd jni
+          ndk-build APP_ABI=arm64-v8a
 
-      - name: Upload Hasil Jadi
+      - name: Upload Hasil
         uses: actions/upload-artifact@v4
         with:
-          name: Hasil_Lib_Final
-          # Mencari semua file .so yang berhasil dibuat dan menyimpannya sebagai ZIP
-          path: |
-            libs/arm64-v8a/*.so
-            obj/local/arm64-v8a/*.so
-            
+          name: Hasil_Build
+          path: libs/arm64-v8a/*.so
+          
