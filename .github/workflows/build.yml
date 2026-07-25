@@ -1,9 +1,35 @@
-      - name: Cari Semua File Android.mk
+name: Build CSPB All Libs
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r21e
+
+      - name: Ekstrak File
+        run: unzip -o jni.zip
+
+      - name: Compile NDK
+        run: ndk-build -C jni APP_ABI=arm64-v8a
+
+      - name: Kumpulkan Semua Library
         run: |
-          echo "Mencari semua file Android.mk di seluruh folder:"
-          find . -name "Android.mk"
-          
-          echo "---"
-          echo "Isi dari Android.mk yang ditemukan:"
-          find . -name "Android.mk" -exec cat {} +
+          mkdir -p output
+          # Mencari dan menyalin semua file .so ke folder output
+          find . -name "*.so" -exec cp -v {} output/ \;
+          echo "Daftar file yang berhasil dikumpulkan:"
+          ls -l output/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hasil_Semua_Lib_Final
+          path: output/
           
