@@ -1,19 +1,37 @@
-android {
-    // ... konfigurasi lainnya ...
+name: Build CSPB APK
 
-    defaultConfig {
-        // ... konfigurasi lainnya ...
+on: [push]
 
-        // Ini memberitahu sistem untuk menyertakan library dari folder jniLibs
-        ndk {
-            abiFilters "arm64-v8a"
-        }
-    }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    // Pastikan sourceSets diarahkan ke folder tempat Anda meletakkan folder libs tadi
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['src/main/jniLibs']
-        }
-    }
-}
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # 1. Langkah Kompilasi C++ (ndk-build)
+      - name: Build C++ with NDK
+        run: ndk-build
+        # Pastikan perintah ini dijalankan di direktori yang benar, 
+        # tambahkan 'working-directory: ./nama_folder_jni' jika perlu
+
+      # 2. Langkah Build APK (Gradle)
+      - name: Build APK
+        run: ./gradlew assembleDebug
+
+      # 3. Langkah Mengunggah APK
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: CSPB_Final_APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          
