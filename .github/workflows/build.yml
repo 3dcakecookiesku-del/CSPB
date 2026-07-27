@@ -15,25 +15,23 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Langkah baru: Menginstal NDK
+      # Instalasi NDK
       - name: Install Android NDK
         run: echo "y" | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --install "ndk;25.1.8937393"
         
-      # Menambahkan path NDK agar dikenali
-      - name: Add NDK to PATH
-        run: echo "PATH=$PATH:${ANDROID_HOME}/ndk/25.1.8937393" >> $GITHUB_ENV
-
-      # Langkah Kompilasi C++
+      # Kompilasi C++ dengan jalur eksplisit
+      # Ganti "." dengan "./app" jika folder jni Anda berada di dalam folder 'app'
       - name: Build C++ with NDK
-        run: ndk-build
-        # Jika file jni berada di sub-folder, tambahkan: working-directory: ./nama_folder
-
+        run: ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./jni/Android.mk
+        
+      # Build APK
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build APK
         run: ./gradlew assembleDebug
 
+      # Upload Artifact v4
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
