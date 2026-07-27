@@ -15,38 +15,25 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # 1. Instalasi NDK
       - name: Install Android NDK
         run: |
           yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
           sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "ndk;25.1.8937393"
 
-      # 2. LANGKAH PENTING: Melihat lokasi file Anda
-      # Setelah ini selesai, cek log GitHub Actions, cari kata "Android.mk"
-      - name: Debug - Cari lokasi file
-        run: ls -R
+      # LANGKAH PENTING: Mencari letak file Android.mk
+      - name: Temukan file Android.mk
+        run: find . -name "Android.mk"
 
-      # 3. Build C++ dengan NDK
-      # (Jika masih error "unknown file", cek log dari langkah "Debug" di atas)
-      - name: Build C++ with NDK
+      - name: Build C++ dengan NDK
         run: |
+          # JANGAN DIUBAH DULU, JALANKAN SAJA
           ${ANDROID_HOME}/ndk/25.1.8937393/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./jni/Android.mk
 
-      # 4. Build APK
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Build APK
-        run: ./gradlew assembleDebug
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
-      # 5. Upload APK
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: CSPB_Final_APK
-          path: app/build/outputs/apk/debug/app-debug.apk
-          
-      # 4. Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
