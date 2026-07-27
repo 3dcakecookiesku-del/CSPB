@@ -21,20 +21,31 @@ jobs:
           yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
           sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "ndk;25.1.8937393"
 
-      # 2. Build C++ dengan NDK
-      # PENTING: Jika error muncul lagi, ubah baris di bawah ini.
-      # Coba ganti ./app/jni/Android.mk menjadi ./jni/Android.mk (atau sebaliknya)
+      # 2. LANGKAH PENTING: Melihat lokasi file Anda
+      # Setelah ini selesai, cek log GitHub Actions, cari kata "Android.mk"
+      - name: Debug - Cari lokasi file
+        run: ls -R
+
+      # 3. Build C++ dengan NDK
+      # (Jika masih error "unknown file", cek log dari langkah "Debug" di atas)
       - name: Build C++ with NDK
         run: |
-          ${ANDROID_HOME}/ndk/25.1.8937393/ndk-build NDK_PROJECT_PATH=./app APP_BUILD_SCRIPT=./app/jni/Android.mk
+          ${ANDROID_HOME}/ndk/25.1.8937393/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./jni/Android.mk
 
-      # 3. Build APK
+      # 4. Build APK
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build APK
         run: ./gradlew assembleDebug
 
+      # 5. Upload APK
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CSPB_Final_APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          
       # 4. Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
