@@ -15,23 +15,27 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # 1. Instalasi NDK
       - name: Install Android NDK
         run: |
           yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
           sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "ndk;25.1.8937393"
 
+      # 2. Build C++ dengan NDK
+      # PENTING: Jika error muncul lagi, ubah baris di bawah ini.
+      # Coba ganti ./app/jni/Android.mk menjadi ./jni/Android.mk (atau sebaliknya)
       - name: Build C++ with NDK
-        # Jika folder 'jni' Anda ada di dalam folder 'app', 
-        # ubah NDK_PROJECT_PATH=. menjadi NDK_PROJECT_PATH=./app
-        # dan APP_BUILD_SCRIPT=./jni/Android.mk menjadi APP_BUILD_SCRIPT=./app/jni/Android.mk
         run: |
-          ${ANDROID_HOME}/ndk/25.1.8937393/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./jni/Android.mk
+          ${ANDROID_HOME}/ndk/25.1.8937393/ndk-build NDK_PROJECT_PATH=./app APP_BUILD_SCRIPT=./app/jni/Android.mk
+
+      # 3. Build APK
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
       - name: Build APK
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+        run: ./gradlew assembleDebug
 
+      # 4. Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
