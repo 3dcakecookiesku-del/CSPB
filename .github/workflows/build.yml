@@ -1,35 +1,19 @@
-name: Build CSPB All Libs
+android {
+    // ... konfigurasi lainnya ...
 
-on: [push]
+    defaultConfig {
+        // ... konfigurasi lainnya ...
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+        // Ini memberitahu sistem untuk menyertakan library dari folder jniLibs
+        ndk {
+            abiFilters "arm64-v8a"
+        }
+    }
 
-      - name: Setup NDK
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r21e
-
-      - name: Ekstrak File
-        run: unzip -o jni.zip
-
-      - name: Compile NDK
-        run: ndk-build -C jni APP_ABI=arm64-v8a
-
-      - name: Kumpulkan Semua Library
-        run: |
-          mkdir -p output
-          # Mencari dan menyalin semua file .so ke folder output
-          find . -name "*.so" -exec cp -v {} output/ \;
-          echo "Daftar file yang berhasil dikumpulkan:"
-          ls -l output/
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Hasil_Semua_Lib_Final
-          path: output/
-          
+    // Pastikan sourceSets diarahkan ke folder tempat Anda meletakkan folder libs tadi
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+}
