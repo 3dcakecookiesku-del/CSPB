@@ -9,9 +9,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # LANGKAH BARU: Ekstrak file zip
       - name: Extract project files
-        run: unzip PB.zip -d extracted_project
+        run: |
+          mkdir extracted_project
+          unzip PB.zip -d extracted_project
+          # DEBUG: Melihat isi file setelah diekstrak
+          ls -R extracted_project
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -24,19 +27,7 @@ jobs:
           yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
           sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "ndk;25.1.8937393"
 
-      # Sekarang kita arahkan ke dalam folder hasil ekstraksi
-      - name: Build C++ with NDK
-        run: |
-          ${ANDROID_HOME}/ndk/25.1.8937393/ndk-build NDK_PROJECT_PATH=./extracted_project APP_BUILD_SCRIPT=./extracted_project/jni/Android.mk
-
-      - name: Build APK
-        run: |
-          chmod +x extracted_project/gradlew
-          ./extracted_project/gradlew assembleDebug -p extracted_project
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: CSPB_Final_APK
-          path: extracted_project/app/build/outputs/apk/debug/app-debug.apk
-          
+      # Kita lewati dulu langkah build untuk melihat isi folder
+      - name: Cek Lokasi File
+        run: echo "Cek log di atas untuk melihat lokasi gradlew atau Android.mk"
+        
