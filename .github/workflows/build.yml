@@ -21,37 +21,31 @@ jobs:
           mkdir -p app/src/main/jni
           unzip PB.zip -d app/src/main/
           
-          # 1. Membuat settings.gradle dengan akses ke repository Google
-          cat <<EOF > settings.gradle
-          pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
-          }
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-          include ':app'
-          EOF
+          # Membuat settings.gradle
+          echo "include ':app'" > settings.gradle
           
-          # 2. Membuat file build.gradle (Root)
+          # Membuat Root build.gradle
           cat <<EOF > build.gradle
-          plugins {
-              id 'com.android.application' version '8.1.0' apply false
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:7.4.2'
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
           }
           EOF
           
-          # 3. Membuat file app/build.gradle
+          # Membuat app/build.gradle
           cat <<EOF > app/build.gradle
-          plugins {
-              id 'com.android.application'
-          }
+          apply plugin: 'com.android.application'
           android {
               compileSdk 33
               namespace "com.example.cspb"
@@ -59,19 +53,17 @@ jobs:
                   applicationId "com.example.cspb"
                   minSdk 21
                   targetSdk 33
-                  versionCode 1
-                  versionName "1.0"
-                  externalNativeBuild {
-                      ndkBuild {
-                          path "src/main/jni/Android.mk"
-                      }
+              }
+              externalNativeBuild {
+                  ndkBuild {
+                      path "src/main/jni/Android.mk"
                   }
               }
           }
           EOF
           
-          # 4. Membuat wrapper gradlew
-          gradle wrapper --gradle-version 8.0
+          # Membuat gradle wrapper
+          gradle wrapper --gradle-version 7.5
 
       - name: Build APK
         run: |
