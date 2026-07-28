@@ -20,10 +20,10 @@ jobs:
           mkdir -p app/src/main/jni
           unzip PB.zip -d app/src/main/
           
-          # Membuat settings.gradle
+          # 1. Membuat settings.gradle
           echo "include ':app'" > settings.gradle
           
-          # Membuat Root build.gradle
+          # 2. Membuat Root build.gradle
           cat <<EOF > build.gradle
           buildscript {
               repositories {
@@ -42,7 +42,7 @@ jobs:
           }
           EOF
           
-          # Membuat app/build.gradle
+          # 3. Membuat app/build.gradle
           cat <<EOF > app/build.gradle
           apply plugin: 'com.android.application'
           android {
@@ -60,14 +60,19 @@ jobs:
               }
           }
           EOF
+          
+          # 4. MEMAKSA PEMBUATAN GRADLE WRAPPER VERSI 7.5
+          # Ini kunci agar versi gradle tidak bentrok dengan sistem
+          gradle wrapper --gradle-version 7.5
 
       - name: Build APK
         run: |
-          # Kita gunakan perintah 'gradle' langsung, bukan './gradlew'
-          gradle assembleDebug
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: CSPB_Final_APK
           path: app/build/outputs/apk/debug/app-debug.apk
+          
