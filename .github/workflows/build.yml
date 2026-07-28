@@ -15,20 +15,39 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android Structure
+            - name: Setup Android Structure
         run: |
           # Membuat struktur folder Android
           mkdir -p app/src/main/jni
           unzip PB.zip -d app/src/main/
           
-          # Membuat file build.gradle minimal
+          # 1. Membuat settings.gradle dengan akses ke repository Google
+          cat <<EOF > settings.gradle
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          include ':app'
+          EOF
+          
+          # 2. Membuat file build.gradle (Root)
           cat <<EOF > build.gradle
           plugins {
               id 'com.android.application' version '8.1.0' apply false
           }
           EOF
           
-          # Membuat file app/build.gradle
+          # 3. Membuat file app/build.gradle
           cat <<EOF > app/build.gradle
           plugins {
               id 'com.android.application'
@@ -51,11 +70,9 @@ jobs:
           }
           EOF
           
-          # Membuat file settings.gradle
-          echo "include ':app'" > settings.gradle
-          
-          # Membuat wrapper gradlew
+          # 4. Membuat wrapper gradlew
           gradle wrapper --gradle-version 8.0
+          
 
       - name: Build APK
         run: |
