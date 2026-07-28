@@ -15,7 +15,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-            - name: Setup Android Structure
+      - name: Setup Android Structure
         run: |
           # Membuat struktur folder Android
           mkdir -p app/src/main/jni
@@ -72,7 +72,6 @@ jobs:
           
           # 4. Membuat wrapper gradlew
           gradle wrapper --gradle-version 8.0
-          
 
       - name: Build APK
         run: |
