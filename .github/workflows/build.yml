@@ -1,4 +1,4 @@
-name: Build CSPB APK
+name: Build APK dari Source C++
 
 on: [push]
 
@@ -9,10 +9,62 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Debug Folder Structure
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android Structure
         run: |
-          mkdir extracted_project
-          unzip PB.zip -d extracted_project
-          echo "--- DAFTAR SEMUA FILE ---"
-          find extracted_project -maxdepth 2
+          # Membuat struktur folder Android
+          mkdir -p app/src/main/jni
+          unzip PB.zip -d app/src/main/
+          
+          # Membuat file build.gradle minimal
+          cat <<EOF > build.gradle
+          plugins {
+              id 'com.android.application' version '8.1.0' apply false
+          }
+          EOF
+          
+          # Membuat file app/build.gradle
+          cat <<EOF > app/build.gradle
+          plugins {
+              id 'com.android.application'
+          }
+          android {
+              compileSdk 33
+              namespace "com.example.cspb"
+              defaultConfig {
+                  applicationId "com.example.cspb"
+                  minSdk 21
+                  targetSdk 33
+                  versionCode 1
+                  versionName "1.0"
+                  externalNativeBuild {
+                      ndkBuild {
+                          path "src/main/jni/Android.mk"
+                      }
+                  }
+              }
+          }
+          EOF
+          
+          # Membuat file settings.gradle
+          echo "include ':app'" > settings.gradle
+          
+          # Membuat wrapper gradlew
+          gradle wrapper --gradle-version 8.0
+
+      - name: Build APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CSPB_Final_APK
+          path: app/build/outputs/apk/debug/app-debug.apk
           
