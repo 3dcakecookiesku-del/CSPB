@@ -9,25 +9,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Extract project files
-        run: |
-          mkdir extracted_project
-          unzip PB.zip -d extracted_project
-          # DEBUG: Melihat isi file setelah diekstrak
-          ls -R extracted_project
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
       - name: Install Android NDK
         run: |
           yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
           sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "ndk;25.1.8937393"
 
-      # Kita lewati dulu langkah build untuk melihat isi folder
-      - name: Cek Lokasi File
-        run: echo "Cek log di atas untuk melihat lokasi gradlew atau Android.mk"
-        
+      - name: Extract, Debug, and Build
+        run: |
+          # 1. Ekstrak file
+          mkdir extracted_project
+          unzip PB.zip -d extracted_project
+          
+          # 2. DEBUG: Tampilkan isi file supaya kita tahu struktur foldernya
+          echo "--- STRUKTUR FOLDER ---"
+          find extracted_project -maxdepth 3
+          
+          # 3. Cari lokasi Android.mk secara otomatis
+          echo "--- LOKASI Android.mk ---"
+          find extracted_project -name "Android.mk"
+          
+          # 4. Build C++ (Kita akan sesuaikan setelah melihat hasil log ini)
+          # Untuk sekarang, kita biarkan kosong agar tidak error dulu
+          
+          # 5. Build APK
+          chmod +x extracted_project/gradlew
+          ./extracted_project/gradlew assembleDebug -p extracted_project
+          
