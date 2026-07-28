@@ -9,33 +9,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Android NDK
+      - name: Debug Folder Structure
         run: |
-          yes | sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
-          sudo ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "ndk;25.1.8937393"
-
-      - name: Extract, Find, and Build
-        run: |
-          # 1. Ekstrak
           mkdir extracted_project
           unzip PB.zip -d extracted_project
-          
-          # 2. Cari di mana lokasi gradlew yang sebenarnya
-          echo "--- LOKASI GRADLEW ---"
-          find extracted_project -name "gradlew"
-          
-          # 3. Simpan lokasi gradlew ke variabel
-          GRADLEW_PATH=$(find extracted_project -name "gradlew" | head -n 1)
-          PROJECT_ROOT=$(dirname "$GRADLEW_PATH")
-          
-          # 4. Beri izin dan jalankan build
-          chmod +x "$GRADLEW_PATH"
-          "$GRADLEW_PATH" assembleDebug -p "$PROJECT_ROOT"
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: CSPB_Final_APK
-          # Path ini kemungkinan besar adalah folder root proyek
-          path: extracted_project/**/build/outputs/apk/debug/*.apk
+          echo "--- DAFTAR SEMUA FILE ---"
+          find extracted_project -maxdepth 2
           
