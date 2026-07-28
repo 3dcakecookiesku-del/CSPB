@@ -17,7 +17,6 @@ jobs:
 
       - name: Setup Android Structure
         run: |
-          # Membuat struktur folder Android
           mkdir -p app/src/main/jni
           unzip PB.zip -d app/src/main/
           
@@ -61,18 +60,14 @@ jobs:
               }
           }
           EOF
-          
-          # Membuat gradle wrapper
-          gradle wrapper --gradle-version 7.5
 
       - name: Build APK
         run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          # Kita gunakan perintah 'gradle' langsung, bukan './gradlew'
+          gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: CSPB_Final_APK
           path: app/build/outputs/apk/debug/app-debug.apk
-          
